@@ -1,7 +1,7 @@
 # Site settings
 title: Your awesome title
 email: yinqinwu@gmail.com
-baseurl: "/blog/" # the subpath of your site, e.g. /blog/
+#baseurl: "/blog/" # the subpath of your site, e.g. /blog/
 url: "https://eagle-s.github.io/" # the base hostname & protocol for your site
 github_username:  jekyll
 
