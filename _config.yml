@@ -1,4 +1,5 @@
 # Site settings
+auto: true
 title: Your awesome title
 email: yinqinwu@gmail.com
 #baseurl: "/blog/" # the subpath of your site, e.g. /blog/
