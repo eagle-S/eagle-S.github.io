@@ -1,10 +1,10 @@
 # Site settings
 auto: true
-title: Your awesome title
+title: stay hungry, stay foolish
 email: yinqinwu@gmail.com
 #baseurl: "/blog/" # the subpath of your site, e.g. /blog/
 url: "https://eagle-s.github.io/" # the base hostname & protocol for your site
-github_username:  jekyll
+github_username:  咫夜星
 
 # Build settings
 markdown: kramdown
