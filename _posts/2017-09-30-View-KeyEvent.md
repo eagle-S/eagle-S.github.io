@@ -11,7 +11,7 @@ tags:
 [TOC]
 
 ## 按键事件处理
-``` java
+```java
 android.view.ViewRootImpl$ViewPostImeInputStage.processKeyEvent(ViewRootImpl.java:4102)
     at android.view.ViewRootImpl$ViewPostImeInputStage.onProcess(ViewRootImpl.java:4000)
     at android.view.ViewRootImpl$InputStage.deliver(ViewRootImpl.java:3562)
@@ -244,7 +244,7 @@ public boolean dispatchKeyEvent(KeyEvent event) {
 #### Event.Callback
 
 从上面代码可以看出是优先调用mOnKeyListener.onKey方法，如果onkey方法返回false才调用event.dispatch。event.dispatch第一个参数为Event.Callback接口：
-```java
+``` java
 public interface Callback {
         /**
          * Called when a key down event has occurred.  If you return true,
@@ -306,17 +306,18 @@ View实现了Event.Callback接口。
 
 综合以上分析可以看出：按键事件通过一层层dispatchKeyEvent分发传给当前获取焦点的View处理，最后获取焦点的View执行优先级是OnKeyListener.onKey > onKeyDown(onKeyUp)
 
-![image](https://github.com/eagle-S/eagle-S.github.io/blob/master/images/view-keyevent/dispatchKeyEvent_1.jpg)
+![image](/images/view-keyevent/dispatchKeyEvent_1.jpg)
 
-![image](https://github.com/eagle-S/eagle-S.github.io/blob/master/images/view-keyevent/dispatchKeyEvent_2.jpg)
+![image](/images/view-keyevent/dispatchKeyEvent_2.jpg)
 
 ### 默认上下左右键实现
 
 如果上面按键分发流程dispatchKeyEvent返回false，则android会针对按下事件，对上下左右键及TAB进行处理，实现默认的焦点切换功能。
 
 #### 按键转换为方向
-1. 首先将按键转换成对应方向值direction，上下左右及前后
-```java
+首先将按键转换成对应方向值direction，上下左右及前后
+
+``` java
 int direction = 0;
         switch (event.getKeyCode()) {
             case KeyEvent.KEYCODE_DPAD_LEFT:
@@ -347,10 +348,9 @@ int direction = 0;
                 }
                 break;
         }
-
 ```
 
-2. 根据当前的焦点状态，查找下一个将要获取焦点的View，然后通过view.requestFocus获取焦点。
+根据当前的焦点状态，查找下一个将要获取焦点的View，然后通过view.requestFocus获取焦点。
 
 如果当前已有view获取焦点focused，则根据当前focused View和方向direction找到下一个将获取焦点的View。
 ```java
@@ -598,7 +598,7 @@ view.findViewByPredicate：
 ```
 可以看到，findViewInsideOutShouldExist这个方法从当前focused view去寻找指定id的view，findViewInsideOutShouldExist中调用的是root.findViewByPredicateInsideOut(this, mMatchIdPredicate);所以findViewByPredicateInsideOut的start参数是当前focused view，即从当前focused view开始向下遍历，如果没找到则从自己的parent开始向下遍历，直到找到id匹配的视图为止
 
-![image](https://github.com/eagle-S/eagle-S.github.io/blob/master/images/view-keyevent/findNextUserSpecifiedFocus.jpg)
+![image](/images/view-keyevent/findNextUserSpecifiedFocus.jpg)
 
 这里要注意的是，也许存在多个相同id的视图（比如ListView，RecyclerView，ViewPager等场景），但是这个方法只会返回在View树中节点范围最近的一个视图，这就是为什么有时候看似指定了focusId，但实际上焦点却丢失的原因，因为焦点跑到了另一个“意想不到”的相同id的视图上。
 
@@ -949,7 +949,7 @@ void offsetRectBetweenParentAndChild(View descendant, Rect rect,
         return closest;
     }
 ```
-![image](https://github.com/eagle-S/eagle-S.github.io/blob/master/images/view-keyevent/findNextFocusInAbsoluteDirection_FOCUS_LEFT.jpg)
+![image](/images/view-keyevent/findNextFocusInAbsoluteDirection_FOCUS_LEFT.jpg)
 
 
 先获取最佳子View的矩形区域mBestCandidateRect。mBestCandidateRect是无效区域最接近focusedRect的矩形。然后遍历focusables列表，根据算法找到最佳的子view。
@@ -1087,7 +1087,7 @@ ListView重写了以上方法，舍弃
 
 
 #### mFocused
-![image](https://github.com/eagle-S/eagle-S.github.io/blob/master/images/view-keyevent/mFocused.jpg)
+![mFocused](/images/view-keyevent/mFocused.jpg)
 mFocused一般通过View.requestFocus获取焦点，最终调用ViewGroup.requestChildFocus()方法获取：
 ```java
 //View.java
@@ -1164,7 +1164,7 @@ public void requestChildFocus(View child, View focused) {
 ```
 
 #### mParent
-![image](https://github.com/eagle-S/eagle-S.github.io/blob/master/images/view-keyevent/mParent.jpg)
+![mParent](/images/view-keyevent/mParent.jpg)
 
 参考：
 1. Android 5.1.1源码
