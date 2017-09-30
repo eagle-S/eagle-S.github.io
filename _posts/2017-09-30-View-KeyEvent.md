@@ -38,14 +38,6 @@ android.view.ViewRootImpl$ViewPostImeInputStage.processKeyEvent(ViewRootImpl.jav
     at android.view.InputEventSender.dispatchInputEventFinished(InputEventSender.java:141)
     at android.os.MessageQueue.nativePollOnce(
     Native Method)
-    at android.os.MessageQueue.next(MessageQueue.java:143)
-    at android.os.Looper.loop(Looper.java:122)
-    at android.app.ActivityThread.main(ActivityThread.java:5254)
-    at java.lang.reflect.Method.invoke(
-    Native Method)
-    at java.lang.reflect.Method.invoke(Method.java:372)
-    at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:940)
-    at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:735)
 ```
  从上面的堆栈信息可以看出是从InputEventSender.dispatchInputEventFinished调用到ViewRootImpl$ViewPostImeInputStage.processKeyEvent，而dispatchInputEventFinished是从native调上来，不做分析。
 ``` java
@@ -184,6 +176,7 @@ if (mView.dispatchKeyEvent(event)) {
 }
 ```
 mView这里是Activity的顶层容器DecorView，它是一FrameLayout，所以这里的dispatchKeyEvent方法应执行的是ViewGroup的dispatchKeyEvent()方法。
+(此处有误，DecorView的ispatchKeyEvent有重写，会先调用Activity的ispatchKeyEvent方法)
 
 ViewGroup的dispatchKeyEvent()方法的源码如下：
 ``` java
@@ -313,7 +306,9 @@ View实现了Event.Callback接口。
 
 综合以上分析可以看出：按键事件通过一层层dispatchKeyEvent分发传给当前获取焦点的View处理，最后获取焦点的View执行优先级是OnKeyListener.onKey > onKeyDown(onKeyUp)
 
-![image]()
+![image](https://github.com/eagle-S/eagle-S.github.io/blob/master/images/view-keyevent/dispatchKeyEvent_1.jpg)
+
+![image](https://github.com/eagle-S/eagle-S.github.io/blob/master/images/view-keyevent/dispatchKeyEvent_2.jpg)
 
 ### 默认上下左右键实现
 
@@ -603,7 +598,10 @@ view.findViewByPredicate：
 ```
 可以看到，findViewInsideOutShouldExist这个方法从当前focused view去寻找指定id的view，findViewInsideOutShouldExist中调用的是root.findViewByPredicateInsideOut(this, mMatchIdPredicate);所以findViewByPredicateInsideOut的start参数是当前focused view，即从当前focused view开始向下遍历，如果没找到则从自己的parent开始向下遍历，直到找到id匹配的视图为止
 
+![image](https://github.com/eagle-S/eagle-S.github.io/blob/master/images/view-keyevent/findNextUserSpecifiedFocus.jpg)
+
 这里要注意的是，也许存在多个相同id的视图（比如ListView，RecyclerView，ViewPager等场景），但是这个方法只会返回在View树中节点范围最近的一个视图，这就是为什么有时候看似指定了focusId，但实际上焦点却丢失的原因，因为焦点跑到了另一个“意想不到”的相同id的视图上。
+
 
 
 ##### 根据相对位置查找
@@ -951,7 +949,7 @@ void offsetRectBetweenParentAndChild(View descendant, Rect rect,
         return closest;
     }
 ```
-![image](https://docs.google.com/drawings/d/e/2PACX-1vQv47tLffefg18IZGsnfgMgb3Gy6jKRxS_eRhjUr_PkTdCKxNJK3ZNVpfxOYcUdZGE8ZCma8Ft6XKtF/pub?w=960&h=720)
+![image](https://github.com/eagle-S/eagle-S.github.io/blob/master/images/view-keyevent/findNextFocusInAbsoluteDirection_FOCUS_LEFT.jpg)
 
 
 先获取最佳子View的矩形区域mBestCandidateRect。mBestCandidateRect是无效区域最接近focusedRect的矩形。然后遍历focusables列表，根据算法找到最佳的子view。
@@ -1089,7 +1087,7 @@ ListView重写了以上方法，舍弃
 
 
 #### mFocused
-
+![image](https://github.com/eagle-S/eagle-S.github.io/blob/master/images/view-keyevent/mFocused.jpg)
 mFocused一般通过View.requestFocus获取焦点，最终调用ViewGroup.requestChildFocus()方法获取：
 ```java
 //View.java
@@ -1166,7 +1164,7 @@ public void requestChildFocus(View child, View focused) {
 ```
 
 #### mParent
-
+![image](https://github.com/eagle-S/eagle-S.github.io/blob/master/images/view-keyevent/mParent.jpg)
 
 参考：
 1. Android 5.1.1源码
